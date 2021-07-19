@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <title>Vue Calculator</title>
+    <style>
+        body {
+            background-color: #aac9ce;
+            display: flex;
+            flex-flow: column nowrap;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+        input {
+            border: 2px solid grey;
+            border-radius: 12px;
+            width: calc(100% - 24px);
+            height: 46px;
+            font-size: 42px;
+            padding: 10px;
+            margin-bottom: 12px;
+
+        }
+        #calculator {
+            width: 360px;
+        }
+        p {
+            display: inline;
+            
+        }
+        input:focus, button:hover {
+            outline: none;
+            background-color: #f3dbcf;
+            transition: 1s;
+        }
+        .text {
+            border: 1px solid black;
+            border-radius: 12px;
+            padding: 12px;
+        }
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+        
+            row-gap: 12px;
+            column-gap: 12px;
+        }
+        button {
+            height: 66px;
+            border: 2px solid grey;
+            border-radius: 12px;
+       
+        }
+         button:last-child {
+            grid-column-start: 1;
+            grid-column-end: 4;
+        }
+        button:active, button:hover {
+            margin-top: 2px;
+            height: 64px;
+        }
+        @media only screen and (orientation: landscape) {
+            #calculator {
+                width: 96vw;
+                height: 96vh;
+            }
+            button, input {
+                min-height: 50px;
+            }
+            .buttons {
+                width: 100%;
+                grid-template-columns: repeat(4, 1fr);
+            }
+            .buttons button:last-child {
+                grid-column-start: 4;
+                grid-column-end: 5;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id='calculator'>
+        <input type='text' v-model='equation' />
+        <div class='buttons'>
+            <button v-for='item in buttons' value=item @click='addToEquation(item)'>{{item}}</button>
+       
+        <button @click='clear()'> c </button>
+        <button @click='doSomeMath()'> = </button>
+        </div>
+        <div id='errorMessage' v-if='showError' @close='showError = false'>
+            
+            <p>ERROR: Input can only be numbers</p>
+        </div>
+    </div>
+</body>
+<script>
+    var app = new Vue({
+        el: '#calculator',
+        data() {
+            return {
+                equation: '',
+                buttons: [1, 2, 3, 4, 5, 6, 7, 8, 9, 0, '+', '-', '/', '*', ],
+                showError: false,
+                lastDigit: 0
+            }
+        },
+        methods: {
+            clear() {
+                this.equation = '';
+            },
+            addToEquation(num) {
+                const CONTAINS_CHAR = /[a-zA-Z]/gm;
+                if (CONTAINS_CHAR.test(this.equation)) {
+                    console.log('ERROR');
+                    this.showError = true;
+                    i
+                } else {
+                    console.log(typeof this.lastDigit + ' ' + this.lastDigit);
+                    this.showError = false;
+                    this.equation += num.toString();
+                    this.lastDigit = num;
+
+
+                }
+            },
+            doSomeMath() {
+                const CONTAINS_CHAR = /[a-zA-Z]/gm;
+                if (CONTAINS_CHAR.test(this.equation)) {
+                    console.log('ERROR');
+                    this.showError = true;
+                    
+                } else {
+                    x = Function('return ' + this.equation)();
+                    console.log(this.equation + ' = ' + x);
+                    if (typeof x === 'number') {
+                        this.equation = x;
+                    }
+                }
+              
+
+            }
+        }
+    })
+</script>
+
+
+</html>
