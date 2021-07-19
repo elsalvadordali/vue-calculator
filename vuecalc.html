@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet"> 
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <title>Vue Calculator</title>
+    <style>
+
+        body {
+            background-color: #f4d7cf;
+            display: flex;
+            font-family: 'Press Start 2P', cursive;
+            flex-flow: column nowrap;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+        input {
+            border-radius: 12px;
+            height: 42px;
+            margin-bottom: 5%;
+            width: 93%;
+            background: #c3c3c3;
+            border: 0;
+            padding: 3%;
+        }
+        #calculator {
+            width: 360px;
+            background: #eee;
+            border-radius: 24px;
+            width: 80vw;
+            min-height: fit-content;
+            padding: 5%;
+        }
+   
+        input:focus, button:hover, button:focus {
+            outline: none;
+            background-color: #1f2e55;
+            color: white;
+            transition: 1s;
+        }
+        .text {
+            border: 1px solid black;
+            border-radius: 12px;
+            padding: 12px;
+        }
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            font-family: 'Press Start 2P', cursive;
+            row-gap: 12px;
+            column-gap: 12px;
+        }
+        button {
+            height: 66px;
+            background: #c3c3c3;
+            border-radius: 12px;
+            border: 0;        
+        }
+         button:last-child {
+            grid-column-start: 1;
+            grid-column-end: 4;
+        }
+        button:active {
+            margin-top: 2px;
+            height: 64px;
+        }
+        @media only screen and (orientation: landscape) {
+            #calculator {
+                width: 96vw;
+                height: 96vh;
+            }
+
+            button {
+                width: 60px;
+                height: 60px;
+            }
+            .buttons {
+                width: 100%;
+                /* grid-template-columns: repeat(6, 1fr); */
+            }
+            .buttons button:last-child {
+                
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id='calculator'>
+        <input type='text' v-model='equation' />
+        <div class='buttons'>
+            <button v-for='item in buttons' value=item @click='addToEquation(item)'>{{item}}</button>
+
+        <button @click='clear()'> c </button>
+        <button @click='doSomeMath()'> = </button>
+        </div>
+
+
+    </div>
+</body>
+<script>
+    var app = new Vue({
+        el: '#calculator',
+        data() {
+            return {
+                equation: '',
+                buttons: [1, 2, 3, 4, 5, 6, 7, 8, 9, 0, '+', '-', '÷', '*', ],
+                lastDigit: 0
+            }
+        },
+        computed: {
+            equation: function (val) {
+                console.log(val);
+                if (val[val.length-1] === '0' && val[val.length-2] === 0) {
+                    val.substring(0, val[val.length-2]);
+                } else {
+                    
+                }
+            }
+        },
+        methods: {
+            clear() {
+                this.equation = ''
+            },
+            addToEquation(num) {
+                const CONTAINS_CHAR = /[a-zA-Z]/gm
+                if (CONTAINS_CHAR.test(this.equation)) {
+
+
+                    this.equation = 'ERR: Only numbers please'
+                } else {
+                    console.log(typeof this.lastDigit + ' ' + this.lastDigit)
+                    if (typeof this.lastDigit == 'number') {
+                        if (this.equation.length == 1 && this.equation[0] == 0) {
+                            this.equation = num
+                            this.lastDigit = num
+                        } else {
+                            this.equation += num.toString()
+                            this.lastDigit = num;
+                        }
+                    } else {
+                        if (num == '*' || num == '+' || num == '-' || num == '/') {
+                            this.equation = this.equation.substring(0, this.equation.length -1)
+                            this.equation += num.toString()
+                            this.lastDigit = num;
+                        } else {
+                            this.equation += num.toString()
+                            this.lastDigit = num;
+                        }
+                        
+                    }
+
+
+
+                }
+            },
+            doSomeMath() {
+                const CONTAINS_CHAR = /[a-zA-Z]/gm;
+                if (CONTAINS_CHAR.test(this.equation)) {
+                    this.equation = 'ERR: Equation cannot contain numbers'
+
+                } else {
+                    x = Function('return ' + this.equation)()
+                    console.log(this.equation + ' = ' + x)
+                    if (typeof x === 'number') {
+                        this.equation = x
+                    }
+                }
+
+
+            }
+        }
+    })
+</script>
+
+
+</html>
