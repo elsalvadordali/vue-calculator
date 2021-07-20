@@ -2,13 +2,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet"> 
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
     <title>Vue Calculator</title>
     <style>
+
         body {
-            background-color: #aac9ce;
+            background-color: #f4d7cf;
             display: flex;
             flex-flow: column nowrap;
             justify-content: center;
@@ -16,52 +20,57 @@
             height: 100vh;
             margin: 0;
             padding: 0;
+            color: #1f2e55;
         }
         input {
-            border: 2px solid grey;
             border-radius: 12px;
-            width: calc(100% - 24px);
-            height: 46px;
-            font-size: 42px;
-            padding: 10px;
-            margin-bottom: 12px;
-
+            height: 42px;
+            margin-bottom: 5%;
+            width: 93%;
+            background: #d6cfcb;
+            color: #918e94;
+            border: 0;
+            padding: 3%;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 36px;
         }
         #calculator {
             width: 360px;
+            background: #eee;
+            border-radius: 24px;
+            width: 80vw;
+            min-height: fit-content;
+            padding: 5%;
+            max-width: 360px;
         }
-        p {
-            display: inline;
-            
-        }
-        input:focus, button:hover {
+   
+        input:focus, button:hover, button:focus {
             outline: none;
-            background-color: #f3dbcf;
+            background-color: #1f2e55;
+            color: white;
             transition: 1s;
         }
-        .text {
-            border: 1px solid black;
-            border-radius: 12px;
-            padding: 12px;
-        }
+       
         .buttons {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-        
             row-gap: 12px;
             column-gap: 12px;
         }
         button {
             height: 66px;
-            border: 2px solid grey;
+            background: #d6cfcb;
+            color: #918e94;
             border-radius: 12px;
-       
+            border: 0;  
+            font-family: 'Press Start 2P', cursive;
+            font-size: 24px;
         }
          button:last-child {
             grid-column-start: 1;
             grid-column-end: 4;
         }
-        button:active, button:hover {
+        button:active {
             margin-top: 2px;
             height: 64px;
         }
@@ -70,16 +79,17 @@
                 width: 96vw;
                 height: 96vh;
             }
-            button, input {
-                min-height: 50px;
+
+            button {
+                width: 60px;
+                height: 60px;
             }
             .buttons {
                 width: 100%;
-                grid-template-columns: repeat(4, 1fr);
+                /* grid-template-columns: repeat(6, 1fr); */
             }
             .buttons button:last-child {
-                grid-column-start: 4;
-                grid-column-end: 5;
+                
             }
         }
     </style>
@@ -88,15 +98,13 @@
     <div id='calculator'>
         <input type='text' v-model='equation' />
         <div class='buttons'>
-            <button v-for='item in buttons' value=item @click='addToEquation(item)'>{{item}}</button>
-       
+            <button v-for='item in buttons' value=item>{{item}}</button>
+
         <button @click='clear()'> c </button>
         <button @click='doSomeMath()'> = </button>
         </div>
-        <div id='errorMessage' v-if='showError' @close='showError = false'>
-            
-            <p>ERROR: Input can only be numbers</p>
-        </div>
+
+
     </div>
 </body>
 <script>
@@ -105,44 +113,59 @@
         data() {
             return {
                 equation: '',
-                buttons: [1, 2, 3, 4, 5, 6, 7, 8, 9, 0, '+', '-', '/', '*', ],
-                showError: false,
+                buttons: [1, 2, 3, 4, 5, 6, 7, 8, 9, '+', 0, '-', '/', '*', ],
                 lastDigit: 0
+            }
+        },
+        computed: {
+            parsedInput() {
+                get(this.equation);
+                
+                
+            
+               
+            }
+        },
+        watch: {
+            equation: function (value) {
+
+                if (value[0] == 0 || value[0] === '*' || value === '/') {
+                    return this.equation = value.slice(1, value.length);
+                } 
+                if (/[a-zA-Z]/gm.test(value)) {
+                    return this.equation = value.slice(value.length);
+                }
+                const doubleZeros = /((\D)0+)/gm;
+                if (doubleZeros.test(value)) {
+                    let x = value.matchAll(doubleZeros);
+                    console.log(x);
+
+                }
+               
             }
         },
         methods: {
             clear() {
-                this.equation = '';
-            },
-            addToEquation(num) {
-                const CONTAINS_CHAR = /[a-zA-Z]/gm;
-                if (CONTAINS_CHAR.test(this.equation)) {
-                    console.log('ERROR');
-                    this.showError = true;
-                    i
-                } else {
-                    console.log(typeof this.lastDigit + ' ' + this.lastDigit);
-                    this.showError = false;
-                    this.equation += num.toString();
-                    this.lastDigit = num;
-
-
-                }
+                this.equation = ''
             },
             doSomeMath() {
                 const CONTAINS_CHAR = /[a-zA-Z]/gm;
                 if (CONTAINS_CHAR.test(this.equation)) {
-                    console.log('ERROR');
-                    this.showError = true;
-                    
+                    this.equation = 'ERR'
+
                 } else {
-                    x = Function('return ' + this.equation)();
-                    console.log(this.equation + ' = ' + x);
-                    if (typeof x === 'number') {
-                        this.equation = x;
+                    try {
+                        x = Function('return ' + this.equation)()
+                        console.log(this.equation + ' = ' + x)
+                        if (typeof x === 'number') {
+                            this.equation = x
+                        }
+                    } catch (e) {
+                        console.log(e);
+                        this.equation = 'ERR';
                     }
                 }
-              
+
 
             }
         }
