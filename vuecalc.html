@@ -14,22 +14,25 @@
         body {
             background-color: #f4d7cf;
             display: flex;
-            font-family: 'Press Start 2P', cursive;
             flex-flow: column nowrap;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
             padding: 0;
+            color: #1f2e55;
         }
         input {
             border-radius: 12px;
             height: 42px;
             margin-bottom: 5%;
             width: 93%;
-            background: #c3c3c3;
+            background: #d6cfcb;
+            color: #918e94;
             border: 0;
             padding: 3%;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 36px;
         }
         #calculator {
             width: 360px;
@@ -38,6 +41,7 @@
             width: 80vw;
             min-height: fit-content;
             padding: 5%;
+            max-width: 360px;
         }
    
         input:focus, button:hover, button:focus {
@@ -46,23 +50,25 @@
             color: white;
             transition: 1s;
         }
-        .text {
-            border: 1px solid black;
-            border-radius: 12px;
-            padding: 12px;
+        button:hover {
+            transition: .5s;
+            background: #102e55;
         }
+       
         .buttons {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            font-family: 'Press Start 2P', cursive;
             row-gap: 12px;
             column-gap: 12px;
         }
         button {
             height: 66px;
-            background: #c3c3c3;
+            background: #d6cfcb;
+            color: #918e94;
             border-radius: 12px;
-            border: 0;        
+            border: 0;  
+            font-family: 'Press Start 2P', cursive;
+            font-size: 24px;
         }
          button:last-child {
             grid-column-start: 1;
@@ -72,23 +78,27 @@
             margin-top: 2px;
             height: 64px;
         }
-        @media only screen and (orientation: landscape) {
-            #calculator {
-                width: 96vw;
-                height: 96vh;
-            }
-
-            button {
-                width: 60px;
-                height: 60px;
-            }
-            .buttons {
-                width: 100%;
-                /* grid-template-columns: repeat(6, 1fr); */
-            }
-            .buttons button:last-child {
-                
-            }
+        @media only screen and  (max-device-height: 420px) and (orientation: landscape) {
+           body {
+               width: 90%;
+               margin: 0 auto;
+           }
+           #calculator {
+               width: 90%;
+               max-width: 700px;
+           }
+           input {
+               margin-bottom: 2%;
+           }
+           .buttons {
+               width: 100%;
+               grid-template-columns: repeat(6, 1fr);
+               grid-template-rows: repeat(3, 1fr);
+           }
+           button:last-child {
+               grid-column-start: 4;
+               grid-column-end: 7;
+           }
         }
     </style>
 </head>
@@ -96,7 +106,7 @@
     <div id='calculator'>
         <input type='text' v-model='equation' />
         <div class='buttons'>
-            <button v-for='item in buttons' value=item @click='addToEquation(item)'>{{item}}</button>
+            <button v-for='item in buttons' v-on:click='addToEquation(item)' value=item>{{item}}</button>
 
         <button @click='clear()'> c </button>
         <button @click='doSomeMath()'> = </button>
@@ -111,17 +121,15 @@
         data() {
             return {
                 equation: '',
-                buttons: [1, 2, 3, 4, 5, 6, 7, 8, 9, 0, '+', '-', '÷', '*', ],
+                buttons: [1, 2, 3, 4, 5, 6, 7, 8, 9, '+', 0, '-', '/', '*', ],
                 lastDigit: 0
             }
         },
-        computed: {
-            equation: function (val) {
-                console.log(val);
-                if (val[val.length-1] === '0' && val[val.length-2] === 0) {
-                    val.substring(0, val[val.length-2]);
-                } else {
-                    
+        watch: {
+            equation: function (value) {
+                const REGEX = /[^\-\+\/\*\d]|[\-\+\/\*]0+\d|^0{2,}/gm;
+                if (REGEX.test(value)) {
+                    return this.equation = value.slice(0, value.length-1);
                 }
             }
         },
@@ -129,48 +137,24 @@
             clear() {
                 this.equation = ''
             },
-            addToEquation(num) {
-                const CONTAINS_CHAR = /[a-zA-Z]/gm
-                if (CONTAINS_CHAR.test(this.equation)) {
-
-
-                    this.equation = 'ERR: Only numbers please'
-                } else {
-                    console.log(typeof this.lastDigit + ' ' + this.lastDigit)
-                    if (typeof this.lastDigit == 'number') {
-                        if (this.equation.length == 1 && this.equation[0] == 0) {
-                            this.equation = num
-                            this.lastDigit = num
-                        } else {
-                            this.equation += num.toString()
-                            this.lastDigit = num;
-                        }
-                    } else {
-                        if (num == '*' || num == '+' || num == '-' || num == '/') {
-                            this.equation = this.equation.substring(0, this.equation.length -1)
-                            this.equation += num.toString()
-                            this.lastDigit = num;
-                        } else {
-                            this.equation += num.toString()
-                            this.lastDigit = num;
-                        }
-                        
-                    }
-
-
-
-                }
+            addToEquation(val) {
+                this.equation = this.equation + val.toString();
             },
             doSomeMath() {
-                const CONTAINS_CHAR = /[a-zA-Z]/gm;
+                const CONTAINS_CHAR = /[^\-\+\/\*\d]/gm;
                 if (CONTAINS_CHAR.test(this.equation)) {
-                    this.equation = 'ERR: Equation cannot contain numbers'
+                    this.equation = 'ERR'
 
                 } else {
-                    x = Function('return ' + this.equation)()
-                    console.log(this.equation + ' = ' + x)
-                    if (typeof x === 'number') {
-                        this.equation = x
+                    try {
+                        x = Function('return ' + this.equation)()
+                        console.log(this.equation + ' = ' + x)
+                        if (typeof x === 'number') {
+                            this.equation = x
+                        }
+                    } catch (e) {
+                        console.log(e);
+                        this.equation = 'ERR';
                     }
                 }
 
